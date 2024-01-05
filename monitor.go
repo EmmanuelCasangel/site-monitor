@@ -2,27 +2,33 @@ package main
 
 import (
 	"fmt"
+	"net/http"
 	"os"
 )
 
 func main() {
 
 	displaysIntroduction()
-	displaysMenu()
-	comand := readComand()
 
-	switch comand {
-	case 1:
-		fmt.Println("Iniciando monitoramento")
-	case 2:
-		fmt.Println("Exibindo logs:")
-	case 0:
-		fmt.Println("Até uma proxima :)")
-		os.Exit(0)
-	default:
-		fmt.Println("Essa opcao nao esta listada")
-		os.Exit(-1)
+	for {
+		displaysMenu()
+		comand := readComand()
+
+		switch comand {
+		case 1:
+			fmt.Println("Iniciando monitoramento")
+			startMonitoring()
+		case 2:
+			fmt.Println("Exibindo logs:")
+		case 0:
+			fmt.Println("Até uma proxima :)")
+			os.Exit(0)
+		default:
+			fmt.Println("Essa opcao nao esta listada")
+			os.Exit(-1)
+		}
 	}
+
 }
 
 func displaysIntroduction() {
@@ -42,7 +48,20 @@ func displaysMenu() {
 func readComand() int {
 	var comand int
 	fmt.Scan(&comand)
-	fmt.Println("O comando escolhido foi:", comand)
 
 	return comand
+}
+
+func startMonitoring() {
+	fmt.Println("Monitorando...")
+	url := "http://www.alura.com.br"
+
+	resp, _ := http.Get(url)
+
+	if resp.StatusCode == 200 {
+		fmt.Println("Site", url, "foi carregado com sucesso")
+	} else {
+		fmt.Println("Site", url, "esta com problemas Status Code:", resp.StatusCode)
+	}
+
 }
