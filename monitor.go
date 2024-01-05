@@ -29,6 +29,7 @@ func main() {
 			startMonitoring()
 		case 2:
 			fmt.Println("Exibindo logs:")
+			displayLogs()
 		case 0:
 			fmt.Println("Até uma proxima :)")
 			os.Exit(0)
@@ -141,9 +142,18 @@ func recordLogs(url string, status bool) {
 
 	}
 
-	file.WriteString(url + "-online:" + strconv.FormatBool(status) + "\n")
-
-	fmt.Println(file)
+	file.WriteString(time.Now().Format("02/01/2006 15:04:05") + " - " + url + " - online: " + strconv.FormatBool(status) + "\n")
 
 	file.Close()
+}
+
+func displayLogs() {
+	file, err := os.ReadFile(logsFileName)
+
+	if err != nil {
+		fmt.Println("Ocorreu um erro", err)
+	}
+
+	fmt.Println(string(file))
+
 }
