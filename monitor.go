@@ -1,17 +1,20 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
+	"io"
 	"net/http"
 	"os"
+	"strings"
 	"time"
 )
 
-const monitoringQuantity = 5
 const delay = 5 * time.Second
+const fileName = "urls.txt"
+const monitoringQuantity = 2
 
 func main() {
-
 	displaysIntroduction()
 
 	for {
@@ -57,12 +60,14 @@ func readComand() int {
 }
 
 func startMonitoring() {
-	urls := []string{
-		"http://www.alura.com.br",
-		"https://httpbin.org/status/500",
-		"https://www.caelum.com.br",
-		"https://github.com/EmmanuelCasangel/site-monitor",
-	}
+	// urls := []string{
+	// 	"http://www.alura.com.br",
+	// 	"https://httpbin.org/status/500",
+	// 	"https://www.caelum.com.br",
+	// 	"https://github.com/EmmanuelCasangel/site-monitor",
+	// }
+
+	urls := readUrlsFromFile(fileName)
 
 	for i := 0; i < monitoringQuantity; i++ {
 		fmt.Println()
@@ -85,4 +90,33 @@ func veridyUrl(url string) {
 	} else {
 		fmt.Println("Site", url, "esta com problemas Status Code:", resp.StatusCode)
 	}
+}
+
+func readUrlsFromFile(fileName string) []string {
+	var urls []string
+
+	file, err := os.Open(fileName)
+	// file, err := os.ReadFile("urls.txt")
+
+	if err != nil {
+		fmt.Println("Ocorreu um erro", err)
+	}
+
+	reader := bufio.NewReader(file)
+
+	for {
+		line, err := reader.ReadString('\n')
+		line = strings.TrimSpace(line)
+
+		urls = append(urls, line)
+
+		if err == io.EOF {
+			break
+		}
+
+	}
+
+	file.Close()
+
+	return urls
 }
