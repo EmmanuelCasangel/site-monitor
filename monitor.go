@@ -6,12 +6,14 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"strconv"
 	"strings"
 	"time"
 )
 
 const delay = 5 * time.Second
-const fileName = "urls.txt"
+const urlsFileName = "urls.txt"
+const logsFileName = "logs.txt"
 const monitoringQuantity = 2
 
 func main() {
@@ -67,7 +69,7 @@ func startMonitoring() {
 	// 	"https://github.com/EmmanuelCasangel/site-monitor",
 	// }
 
-	urls := readUrlsFromFile(fileName)
+	urls := readUrlsFromFile(urlsFileName)
 
 	for i := 0; i < monitoringQuantity; i++ {
 		fmt.Println()
@@ -75,20 +77,26 @@ func startMonitoring() {
 
 		for _, url := range urls {
 
-			veridyUrl(url)
+			verifyUrl(url)
 		}
 		time.Sleep(delay)
 	}
 
 }
 
-func veridyUrl(url string) {
-	resp, _ := http.Get(url)
+func verifyUrl(url string) {
+	resp, err := http.Get(url)
+
+	if err != nil {
+		fmt.Println("Ocorreu um erro", err)
+	}
 
 	if resp.StatusCode == 200 {
 		fmt.Println("Site", url, "foi carregado com sucesso")
+		recordLogs(url, true)
 	} else {
 		fmt.Println("Site", url, "esta com problemas Status Code:", resp.StatusCode)
+		recordLogs(url, false)
 	}
 }
 
@@ -119,4 +127,23 @@ func readUrlsFromFile(fileName string) []string {
 	file.Close()
 
 	return urls
+}
+
+func recordLogs(url string, status bool) {
+	file, err := os.OpenFile(
+		logsFileName,
+		os.O_CREATE|os.O_RDWR|os.O_APPEND,
+		0666,
+	)
+
+	if err != nil {
+		fmt.Println("Ocorreu um erro", err)
+
+	}
+
+	file.WriteString(url + "-online:" + strconv.FormatBool(status) + "\n")
+
+	fmt.Println(file)
+
+	file.Close()
 }
