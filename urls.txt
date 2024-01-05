@@ -1,0 +1,4 @@
+http://www.alura.com.br
+https://httpbin.org/status/500
+https://www.caelum.com.br
+https://github.com/EmmanuelCasangel/site-monitor
