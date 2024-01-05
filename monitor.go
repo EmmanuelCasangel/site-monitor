@@ -4,7 +4,11 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"time"
 )
+
+const monitoringQuantity = 5
+const delay = 5 * time.Second
 
 func main() {
 
@@ -53,9 +57,27 @@ func readComand() int {
 }
 
 func startMonitoring() {
-	fmt.Println("Monitorando...")
-	url := "http://www.alura.com.br"
+	urls := []string{
+		"http://www.alura.com.br",
+		"https://httpbin.org/status/500",
+		"https://www.caelum.com.br",
+		"https://github.com/EmmanuelCasangel/site-monitor",
+	}
 
+	for i := 0; i < monitoringQuantity; i++ {
+		fmt.Println()
+		fmt.Println("Realizando monitoramentos:")
+
+		for _, url := range urls {
+
+			veridyUrl(url)
+		}
+		time.Sleep(delay)
+	}
+
+}
+
+func veridyUrl(url string) {
 	resp, _ := http.Get(url)
 
 	if resp.StatusCode == 200 {
@@ -63,5 +85,4 @@ func startMonitoring() {
 	} else {
 		fmt.Println("Site", url, "esta com problemas Status Code:", resp.StatusCode)
 	}
-
 }
